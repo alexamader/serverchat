@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script language="JavaScript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://127.0.0.1:3030/socket.io/socket.io.js"></script>
+
+<script>
+
+    $(document).ready(function(){
+
+        $("#message_transmission_area").hide();
+
+        var socket = io.connect('http://127.0.0.1:3030');
+
+        socket.on("server_connected", function() {
+
+            console.log("Connection made.");
+
+        });
+
+        var username = "guest";
+
+        $("#login").click(function() {
+
+          username = $('#username').val();
+          var password = $('#password').val();
+
+          $("#welcome_message").text("Welcome, " + username + "!");
+          socket.emit('username_set', [username, password]);
+        });
+        socket.on('loginsucces', function() {
+          $("#message_transmission_area").show();
+
+        });
+        socket.on('login_failed', function() {
+          username = "guest";
+          $('#welcome_message').text("Loggin Incorrect");
+        });
+
+        $("#send_message").click(function() {
+
+          console.log($("#message").val());
+          socket.emit('new_message_sent', "<b>" + username + ":</b> " + $("#message").val());
+
+        });
+        socket.on('user disconnected', function(chat_history) {
+
+          $('#messages_received').html(chat_history);
+
+        });
+
+        socket.on('history_found', function(chat_history) {
+
+          $('#messages_received').html(chat_history);
+
+        });
+
+        socket.on('message_update', function(new_message) {
+
+          $('#messages_received').append(new_message + "<br>");
+
+        });
+
+        socket.on('usernames', function(usernames) {
+
+          $('#usernames').html(usernames);
+
+        });
+
+
+
+    });
+
+</script>
+</head>
+<body style= "background-color: #CB917C">
+<h1 id="welcome_message">Welcome!</h1>
+  <style>
+  h1 {
+  background-color: #8498D8;
+  font-family:Cursive;
+  transition-duration: 1s;
+  backface-visibility: hidden;
+}
+h1:hover {
+  background-color: pink;
+    transform: scale(2, .1) rotate(90deg);
+  text-align: center;
+}
+  </style>
+  <br>
+
+  <input type="text" id="username" value="Username">
+  
+
+  <br>
+
+  <input type="password" id="password" value="Password">
+
+  <br>
+
+  <button id="login">Login</button>
+
+  <br>
+  <br>
+
+  <div id="message_transmission_area">
+    <input type="text" id="message">
+    <button id="send_message">Send Message</button>
+  </div>
+
+  <br>
+  <br>
+
+  <h2>People connected:</h2>
+  <br>
+  <div id="usernames"></div>
+
+  <br>
+  <br>
+  <h2 style="background-color: gray">Messages:</h2>
+  <div  style="background-color: gray" id="messages_received"></div>
+</body>
+
+
