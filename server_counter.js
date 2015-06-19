@@ -22,7 +22,7 @@ var server = http.createServer(function (req, res) {
             break;
     }
 
-}).listen(3030, "127.0.0.1");
+}).listen(8080);
 
 console.log('Server running at http://127.0.0.1:3030/');
 
